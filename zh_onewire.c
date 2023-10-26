@@ -51,6 +51,7 @@ esp_err_t zh_onewire_reset(void)
             while (gpio_get_level(s_onewire_pin) == 0)
             {
             }
+            os_delay_us(480);
             return ESP_OK;
         }
         os_delay_us(1);
@@ -91,12 +92,12 @@ uint8_t zh_onewire_read_bit(void)
 {
     gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
     gpio_set_level(s_onewire_pin, 0);
-    os_delay_us(2);
+    os_delay_us(5);
     gpio_set_level(s_onewire_pin, 1);
     gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    os_delay_us(8);
+    os_delay_us(10);
     uint8_t bit = gpio_get_level(s_onewire_pin);
-    os_delay_us(80);
+    os_delay_us(90);
     return bit;
 }
 
