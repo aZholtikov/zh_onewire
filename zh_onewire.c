@@ -51,7 +51,7 @@ esp_err_t zh_onewire_reset(void)
             while (gpio_get_level(s_onewire_pin) == 0)
             {
             }
-            os_delay_us(480);
+            esp_rom_delay_us(480);
             return ESP_OK;
         }
         esp_rom_delay_us(1);
