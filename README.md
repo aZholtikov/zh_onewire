@@ -1,6 +1,9 @@
-# ESP8266 RTOS SDK component for 1-Wire interface
+# ESP32 ESP-IDF and ESP8266 RTOS SDK component for 1-Wire interface
 
-There are two branches - for ESP8266 family and for ESP32 family. Please use the appropriate one.
+## Tested on
+
+1. ESP8266 RTOS_SDK v3.4
+2. ESP32 ESP-IDF v5.1.0
 
 ## Using
 
@@ -8,7 +11,7 @@ In an existing project, run the following command to install the component:
 
 ```text
 cd ../your_project/components
-git clone -b esp8266 --recursive http://git.zh.com.ru/alexey.zholtikov/zh_onewire.git
+git clone http://git.zh.com.ru/alexey.zholtikov/zh_onewire.git
 ```
 
 In the application, add the component:
@@ -22,14 +25,13 @@ In the application, add the component:
 Search 1-Wire devices on bus:
 
 ```c
-#include "stdio.h"
 #include "zh_onewire.h"
 
 void app_main(void)
 {
     uint8_t *rom = NULL;
-    ESP_ERROR_CHECK(zh_onewire_init(GPIO));
-    if (zh_onewire_reset() == ESP_FAIL)
+    zh_onewire_init(GPIO_NUM_5);
+    if (zh_onewire_reset() != ESP_OK)
     {
         printf("There are no 1-Wire devices available on the bus.\n");
     }

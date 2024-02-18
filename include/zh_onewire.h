@@ -28,17 +28,10 @@ extern "C"
      *
      * @return
      *              - ESP_OK if reset was successful
-     *              - ESP_FAIL if there are no 1-Wire devices available on the bus or the devices are not responding
+     *              - ESP_ERR_INVALID_RESPONSE if the bus is busy
+     *              - ESP_ERR_TIMEOUT if there are no 1-Wire devices available on the bus or the devices are not responding
      */
     esp_err_t zh_onewire_reset(void);
-
-    /**
-     * @brief      Send one bit to 1-Wire device.
-     *
-     * @param[in]  bit  Bit value.
-     *
-     */
-    void zh_onewire_send_bit(const uint8_t bit);
 
     /**
      * @brief      Send one byte to 1-Wire device.
@@ -47,14 +40,6 @@ extern "C"
      *
      */
     void zh_onewire_send_byte(uint8_t byte);
-
-    /**
-     * @brief      Read one bit from 1-Wire device.
-     *
-     * @return
-     *              - Bit value
-     */
-    uint8_t zh_onewire_read_bit(void);
 
     /**
      * @brief      Read one byte from 1-Wire device.
