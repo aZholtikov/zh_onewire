@@ -112,36 +112,6 @@ ZH_ONEWIRE_RESET_EXIT:
     return ESP_ERR_TIMEOUT;
 }
 
-static void s_zh_onewire_send_bit(const uint8_t bit)
-{
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
-#ifdef CONFIG_IDF_TARGET_ESP8266
-    taskENTER_CRITICAL();
-#else
-    taskENTER_CRITICAL(&s_spinlock);
-#endif
-    gpio_set_level(s_onewire_pin, 0);
-    if (bit == 0)
-    {
-        esp_delay_us(ZH_ONEWIRE_TIME_SLOT_DURATION);
-        gpio_set_level(s_onewire_pin, 1);
-        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-        esp_delay_us(ZH_ONEWIRE_RECOVERY_DURATION);
-    }
-    else
-    {
-        esp_delay_us(ZH_ONEWIRE_TIME_SLOT_START_DURATION);
-        gpio_set_level(s_onewire_pin, 1);
-        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-        esp_delay_us(ZH_ONEWIRE_TIME_SLOT_DURATION);
-    }
-#ifdef CONFIG_IDF_TARGET_ESP8266
-    taskEXIT_CRITICAL();
-#else
-    taskEXIT_CRITICAL(&s_spinlock);
-#endif
-}
-
 void zh_onewire_send_byte(uint8_t byte)
 {
     for (uint8_t i = 0; i < 8; ++i)
@@ -149,43 +119,6 @@ void zh_onewire_send_byte(uint8_t byte)
         s_zh_onewire_send_bit(byte & 1);
         byte >>= 1;
     }
-}
-
-static uint8_t s_zh_onewire_read_bit(void)
-{
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
-#ifdef CONFIG_IDF_TARGET_ESP8266
-    taskENTER_CRITICAL();
-#else
-    taskENTER_CRITICAL(&s_spinlock);
-#endif
-    gpio_set_level(s_onewire_pin, 0);
-    esp_delay_us(ZH_ONEWIRE_TIME_SLOT_START_DURATION);
-    gpio_set_level(s_onewire_pin, 1);
-    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
-    esp_delay_us(ZH_ONEWIRE_VALID_DATA_DURATION - ZH_ONEWIRE_TIME_SLOT_START_DURATION);
-    uint8_t bit = gpio_get_level(s_onewire_pin);
-    esp_delay_us(ZH_ONEWIRE_TIME_SLOT_DURATION - ZH_ONEWIRE_RECOVERY_DURATION - ZH_ONEWIRE_VALID_DATA_DURATION);
-#ifdef CONFIG_IDF_TARGET_ESP8266
-    taskEXIT_CRITICAL();
-#else
-    taskEXIT_CRITICAL(&s_spinlock);
-#endif
-    return bit;
-}
-
-uint8_t zh_onewire_read_byte(void)
-{
-    uint8_t byte = 0;
-    for (uint8_t i = 0; i < 8; ++i)
-    {
-        byte >>= 1;
-        if (s_zh_onewire_read_bit() != 0)
-        {
-            byte |= 0x80;
-        }
-    }
-    return byte;
 }
 
 esp_err_t zh_onewire_skip_rom(void)
@@ -326,4 +259,71 @@ uint8_t *zh_onewire_search_rom_next(void)
     }
     s_onewire_rom_fork_bit = new_fork;
     return &s_onewire_rom[0];
+}
+
+static uint8_t s_zh_onewire_read_bit(void)
+{
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
+#ifdef CONFIG_IDF_TARGET_ESP8266
+    taskENTER_CRITICAL();
+#else
+    taskENTER_CRITICAL(&s_spinlock);
+#endif
+    gpio_set_level(s_onewire_pin, 0);
+    esp_delay_us(ZH_ONEWIRE_TIME_SLOT_START_DURATION);
+    gpio_set_level(s_onewire_pin, 1);
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+    esp_delay_us(ZH_ONEWIRE_VALID_DATA_DURATION - ZH_ONEWIRE_TIME_SLOT_START_DURATION);
+    uint8_t bit = gpio_get_level(s_onewire_pin);
+    esp_delay_us(ZH_ONEWIRE_TIME_SLOT_DURATION - ZH_ONEWIRE_RECOVERY_DURATION - ZH_ONEWIRE_VALID_DATA_DURATION);
+#ifdef CONFIG_IDF_TARGET_ESP8266
+    taskEXIT_CRITICAL();
+#else
+    taskEXIT_CRITICAL(&s_spinlock);
+#endif
+    return bit;
+}
+
+uint8_t zh_onewire_read_byte(void)
+{
+    uint8_t byte = 0;
+    for (uint8_t i = 0; i < 8; ++i)
+    {
+        byte >>= 1;
+        if (s_zh_onewire_read_bit() != 0)
+        {
+            byte |= 0x80;
+        }
+    }
+    return byte;
+}
+
+static void s_zh_onewire_send_bit(const uint8_t bit)
+{
+    gpio_set_direction(s_onewire_pin, GPIO_MODE_OUTPUT);
+#ifdef CONFIG_IDF_TARGET_ESP8266
+    taskENTER_CRITICAL();
+#else
+    taskENTER_CRITICAL(&s_spinlock);
+#endif
+    gpio_set_level(s_onewire_pin, 0);
+    if (bit == 0)
+    {
+        esp_delay_us(ZH_ONEWIRE_TIME_SLOT_DURATION);
+        gpio_set_level(s_onewire_pin, 1);
+        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+        esp_delay_us(ZH_ONEWIRE_RECOVERY_DURATION);
+    }
+    else
+    {
+        esp_delay_us(ZH_ONEWIRE_TIME_SLOT_START_DURATION);
+        gpio_set_level(s_onewire_pin, 1);
+        gpio_set_direction(s_onewire_pin, GPIO_MODE_INPUT);
+        esp_delay_us(ZH_ONEWIRE_TIME_SLOT_DURATION);
+    }
+#ifdef CONFIG_IDF_TARGET_ESP8266
+    taskEXIT_CRITICAL();
+#else
+    taskEXIT_CRITICAL(&s_spinlock);
+#endif
 }
