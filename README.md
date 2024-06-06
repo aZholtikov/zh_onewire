@@ -31,6 +31,7 @@ Search 1-Wire devices on bus:
 
 void app_main(void)
 {
+    esp_log_level_set("zh_onewire", ESP_LOG_NONE);
     uint8_t *rom = NULL;
     zh_onewire_init(GPIO_NUM_5);
     if (zh_onewire_reset() != ESP_OK)
