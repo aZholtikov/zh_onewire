@@ -15,10 +15,10 @@
 #define TIME_SLOT_DURATION 120          // Time slot.
 #define VALID_DATA_DURATION 15          // Valid data duration.
 
-#define SKIP_ROM 0xCC
-#define MATCH_ROM 0x55
-#define READ_ROM 0x33
-#define SEARCH_ROM 0xF0
+#define SKIP_ROM 0xCC   // Skip ROM command to address all 1-Wire devices.
+#define MATCH_ROM 0x55  // Match ROM command to address a specific 1-Wire device.
+#define READ_ROM 0x33   // Read ROM command for read ROM on only one 1-Wire device.
+#define SEARCH_ROM 0xF0 // Read ROM on all 1-Wire devices.
 
 #define pgm_read_byte(addr) (*(const uint8_t *)(addr))
 /// \endcond
