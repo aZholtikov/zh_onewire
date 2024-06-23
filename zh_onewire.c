@@ -1,12 +1,5 @@
-/**
- * @file
- * The main code of the zh_onewire component.
- *
- */
-
 #include "zh_onewire.h"
 
-/// \cond
 #define MASTER_RESET_PULSE_DURATION 480 // Reset time high. Reset time low.
 #define RESPONSE_MAX_DURATION 60        // Presence detect high.
 #define PRESENCE_PULSE_MAX_DURATION 240 // Presence detect low.
@@ -21,18 +14,15 @@
 #define SEARCH_ROM 0xF0 // Read ROM on all 1-Wire devices.
 
 #define pgm_read_byte(addr) (*(const uint8_t *)(addr))
-/// \endcond
 
 static uint8_t _read_bit(void);
 static void _send_bit(const uint8_t bit);
 
-/// \cond
 #ifdef CONFIG_IDF_TARGET_ESP8266
 #define esp_delay_us(x) os_delay_us(x)
 #else
 #define esp_delay_us(x) esp_rom_delay_us(x)
 #endif
-/// \endcond
 
 static const char *TAG = "zh_onewire";
 

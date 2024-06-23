@@ -1,9 +1,3 @@
-/**
- * @file
- * Header file for the zh_onewire component.
- *
- */
-
 #pragma once
 
 #include "stdio.h"
