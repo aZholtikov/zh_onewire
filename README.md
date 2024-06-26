@@ -5,8 +5,6 @@
 1. ESP8266 RTOS_SDK v3.4
 2. ESP32 ESP-IDF v5.2
 
-## [Function description](http://zh-onewire.zh.com.ru)
-
 ## Using
 
 In an existing project, run the following command to install the component:
